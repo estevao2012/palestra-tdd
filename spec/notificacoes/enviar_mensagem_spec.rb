@@ -4,38 +4,54 @@ require_relative '../../notificacoes/enviar_mensagem.rb'
 module Notificacoes
   describe EnviarMensagem do
     let(:email) { 'teste@email.com' }
-    subject { described_class.new(arquivo) }
+    let(:mensagem) { 'oi mtc!' }
+    subject { described_class.new(arquivo, notificador) }
 
     describe '#enviar' do
       context 'escola classica' do
         let(:arquivo) { Arquivo.new }
-        let(:destinatario) { Destinatario.new(email) }
+        let(:notificador) { Notificador.new }
 
-        it 'buscar destinatario' do
-          expect(arquivo).
-            to receive(:busca_destinatario).
-            with(email).
-            and_return(destinatario)
-        end
+        it 'envia com sucesso' do
+          resultado = subject.enviar(email, mensagem)
 
-        after do
-          subject.enviar(email)
+          expect(resultado).to be_truthy
         end
       end
 
       context 'escola mockista' do
         let(:arquivo) { double }
         let(:destinatario) { double }
+        let(:notificador) { double }
 
-        it 'buscar destinatario' do
+        before(:each) do
+          allow(arquivo).
+            to receive(:busca_destinatario).
+            with(email).
+            and_return(destinatario)
+
+          allow(notificador).
+            to receive(:enviar).
+            with(mensagem, destinatario).
+            and_return(true)
+        end
+
+        it 'busca destinatario' do
           expect(arquivo).
             to receive(:busca_destinatario).
             with(email).
             and_return(destinatario)
+
+          expect(subject.enviar(email, mensagem)).to be_truthy
         end
 
-        after(:each) do
-          subject.enviar(email)
+        it 'envia notificacao' do
+          expect(notificador).
+            to receive(:enviar).
+            with(mensagem, destinatario).
+            and_return(true)
+
+            expect(subject.enviar(email, mensagem)).to be_truthy
         end
       end
     end

@@ -1,8 +1,6 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.5'
-
 group :development, :test do
   gem 'byebug', platforms: %I[mri mingw x64_mingw]
   gem 'guard-rspec'
